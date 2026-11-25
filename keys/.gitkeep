@@ -1,0 +1,2 @@
+# Esta carpeta almacena localmente tu API Key (.pem) y tus llaves SSH.
+# Todos los archivos dentro de keys/ (salvo este .gitkeep) están ignorados por .gitignore.

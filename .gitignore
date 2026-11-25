@@ -1,0 +1,18 @@
+# Terraform files
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Variables con credenciales reales y llaves privadas (NUNCA subir a Git)
+*.tfvars
+!terraform.tfvars.example
+*.pem
+keys/*
+!keys/.gitkeep

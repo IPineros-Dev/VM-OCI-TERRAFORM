@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -euxo pipefail
+
+# Registrar toda la salida del aprovisionamiento inicial para diagnóstico vía SSH
+exec > >(tee -a /var/log/ecored-bootstrap.log) 2>&1
+
+export DEBIAN_FRONTEND=noninteractive
+REPO_URL="${repo_url}"
+WEB_ROOT="${web_root}"
+
+echo "=== [1/5] Instalando Nginx y Git ==="
+apt-get -o DPkg::Lock::Timeout=180 update -y
+apt-get -o DPkg::Lock::Timeout=180 install -y nginx git
+
+echo "=== [2/5] Clonando repositorio estático en $WEB_ROOT ==="
+rm -rf "$WEB_ROOT"
+git clone "$REPO_URL" "$WEB_ROOT"
+chown -R ubuntu:www-data "$WEB_ROOT"
+chmod -R u=rwX,g=rX,o=rX "$WEB_ROOT"
+
+echo "=== [3/5] Configurando Nginx ==="
+cat <<'EOF' > /etc/nginx/sites-available/default
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root ${web_root};
+    index index.html;
+
+    server_name _;
+
+    location ~ /\.git {
+        deny all;
+    }
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+EOF
+
+nginx -t
+systemctl enable nginx
+systemctl restart nginx
+
+echo "=== [4/5] Abriendo puertos 80 y 443 en iptables (persistente) ==="
+for PORT in 80 443; do
+  if ! iptables -C INPUT -p tcp -m state --state NEW --dport "$PORT" -j ACCEPT 2>/dev/null; then
+    iptables -I INPUT 1 -p tcp -m state --state NEW --dport "$PORT" -j ACCEPT
+  fi
+done
+
+if command -v netfilter-persistent >/dev/null 2>&1; then
+  netfilter-persistent save
+elif [ -d /etc/iptables ]; then
+  iptables-save > /etc/iptables/rules.v4
+fi
+
+if command -v ufw >/dev/null 2>&1 && ufw status | grep -q "Status: active"; then
+  ufw allow 80/tcp
+  ufw allow 443/tcp
+fi
+
+echo "=== [5/5] Verificando respuesta local de Nginx ==="
+curl -sI http://127.0.0.1 | head -n 5
+touch /var/log/ecored-bootstrap.done
+echo "=== Bootstrap completado correctamente ==="
