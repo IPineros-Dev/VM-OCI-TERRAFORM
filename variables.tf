@@ -48,9 +48,15 @@ variable "vm_display_name" {
 }
 
 variable "vm_shape" {
-  description = "Shape de cómputo en OCI (ej. VM.Standard.E2.1.Micro, VM.Standard.A1.Flex, VM.Standard.E4.Flex)"
+  description = "Shape de cómputo en OCI (recomendado: VM.Standard.E5.Flex en Free Trial/PAYG o VM.Standard.E2.1.Micro en Always Free)"
   type        = string
-  default     = "VM.Standard.E2.1.Micro"
+  default     = "VM.Standard.E5.Flex"
+}
+
+variable "fault_domain" {
+  description = "Fault Domain opcional (ej. FAULT-DOMAIN-1, FAULT-DOMAIN-2, FAULT-DOMAIN-3). Dejar null para selección automática."
+  type        = string
+  default     = null
 }
 
 variable "vm_ocpus" {

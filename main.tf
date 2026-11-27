@@ -92,6 +92,7 @@ resource "oci_core_network_security_group_security_rule" "egress_all" {
 # Instancia de Máquina Virtual (Compute Instance)
 resource "oci_core_instance" "vm" {
   availability_domain = local.availability_domain
+  fault_domain        = var.fault_domain
   compartment_id      = var.compartment_ocid
   display_name        = var.vm_display_name
   shape               = var.vm_shape
