@@ -26,7 +26,6 @@ Guía práctica y paso a paso para aprovisionar automáticamente una máquina vi
    - [Paso 10: Probar destrucción y recreación automatizada (`destroy` → `apply`)](#paso-10-probar-destrucción-y-recreación-automatizada-destroy--apply)
 6. [Solución de Problemas Comunes (Troubleshooting)](#6-solución-de-problemas-comunes-troubleshooting)
 7. [Buenas Prácticas de Seguridad](#7-buenas-prácticas-de-seguridad)
-8. [Lista de Capturas de Pantalla Sugeridas](#8-lista-de-capturas-de-pantalla-sugeridas)
 
 ---
 
@@ -132,7 +131,7 @@ Terraform necesita identificadores exactos (`OCID`) para saber en qué cuenta, u
    - Haz clic en la **Route Table** asociada a esa subnet y confirma que exista una regla con **Target Type: Internet Gateway** y **Destination CIDR Block: `0.0.0.0/0`**.
 
 >
-> ![Obtención de OCIDs y verificación de Subnet pública en OCI](C:\Users\nuest\OneDrive\Documentos\Universidad\SEXTO_SEMESTRE\capturas_terraform\route-rules.png)
+> ![Obtención de OCIDs y verificación de Subnet pública en OCI](docs/screenshots/route-rules.png)
 
 ---
 
@@ -151,7 +150,7 @@ OCI no permite autenticar Terraform con usuario y contraseña web. En su lugar e
 7. En la ventana *Configuration file preview* que aparece inmediatamente, copia el valor de **`fingerprint`** (formato `xx:xx:xx:...`).
 
 >
-> ![Generación de API Key y descarga de la Private Key .pem en OCI](C:\Users\nuest\OneDrive\Documentos\Universidad\SEXTO_SEMESTRE\capturas_terraform\api-keys.png)
+> ![Generación de API Key y descarga de la Private Key .pem en OCI](docs/screenshots/api-keys.png)
 
 ---
 
@@ -176,7 +175,7 @@ allow group <nombre-de-tu-grupo> to use cloud-shell-public-network in tenancy
 3. En la barra superior de Cloud Shell, verifica que el modo de red sea **Public network** (necesario para clonar repositorios de GitHub y probar conexiones hacia la IP pública de la VM).
 
 >
-> ![Apertura de OCI Cloud Shell en la consola de OCI](C:\Users\nuest\OneDrive\Documentos\Universidad\SEXTO_SEMESTRE\capturas_terraform\oracle-shell.png)
+> ![Apertura de OCI Cloud Shell en la consola de OCI](docs/screenshots/oracle-shell.png)
 
 #### 3.3 Cargar el archivo de la Private Key (`.pem`) en OCI Cloud Shell
 1. En la esquina superior derecha de la ventana de **OCI Cloud Shell**, haz clic en el menú de acciones (**icono de engranaje ⚙️** o menú `≡`).
@@ -190,7 +189,7 @@ ls -la ~/*.pem
 ```
 
 >
-> ![Carga del archivo Private Key .pem en OCI Cloud Shell](C:\Users\nuest\OneDrive\Documentos\Universidad\SEXTO_SEMESTRE\capturas_terraform\upload.png)
+> ![Carga del archivo Private Key .pem en OCI Cloud Shell](docs/screenshots/upload.png)
 
 ---
 
@@ -277,7 +276,7 @@ ls -la ./keys/
 ```
 
 >
-> ![Clonación del repositorio y configuración de llaves en OCI Cloud Shell](C:\Users\nuest\OneDrive\Documentos\Universidad\SEXTO_SEMESTRE\capturas_terraform\gitclone.png)
+> ![Clonación del repositorio y configuración de llaves en OCI Cloud Shell](docs/screenshots/gitclone.png)
 
 ---
 
@@ -333,7 +332,7 @@ Guarda y sal de `nano` con `Ctrl + O`, `Enter`, y luego `Ctrl + X`.
 > * **Cuenta solo *Always Free* (sin *Free Trial* ni *upgrade* a PAYG):** cambia `vm_shape` a **`VM.Standard.E2.1.Micro`** (AMD x86_64, 1 OCPU, 1 GB RAM, sin costo) o **`VM.Standard.A1.Flex`** (ARM Ampere). El bloque `dynamic "shape_config"` y el filtro de imagen en `main.tf` se adaptan automáticamente a cualquier shape flexible o fijo.
 
 >
-> ![Configuración de variables en terraform.tfvars](C:\Users\nuest\OneDrive\Documentos\Universidad\SEXTO_SEMESTRE\capturas_terraform\variables.png)
+> ![Configuración de variables en terraform.tfvars](docs/screenshots/variables.png)
 
 ---
 
@@ -405,7 +404,7 @@ En ~40–60 segundos Terraform terminará y mostrará la sección **`Outputs:`**
 * `ssh_command` (`ssh -i ./keys/oci_vm_key ubuntu@<PUBLIC_IP>`)
 
 >
-> ![Resultado de terraform apply con los outputs y la IP pública asignada](C:\Users\nuest\OneDrive\Documentos\Universidad\SEXTO_SEMESTRE\capturas_terraform\terraform_output.png)
+> ![Resultado de terraform apply con los outputs y la IP pública asignada](docs/screenshots/terraform_output.png)
 
 ---
 
@@ -452,14 +451,14 @@ exit
 ```
 
 >
-> ![Verificación de cloud-init, Nginx y respuesta HTTP 200 OK](C:\Users\nuest\OneDrive\Documentos\Universidad\SEXTO_SEMESTRE\capturas_terraform\ssh.png)
+> ![Verificación de cloud-init, Nginx y respuesta HTTP 200 OK](docs/screenshots/ssh.png)
 
 #### 9.3 Abrir el sitio web en tu navegador
 Copia la URL de `web_url` (por ejemplo `http://203.0.113.25`) y ábrela en tu navegador.
 > **Importante:** Usa **`http://`** y no `https://`, ya que el sitio se expone directamente por IP pública sin un dominio ni certificado TLS asociado.
 
 >
-> ![Aplicación EcoRed Circular cargando desde la IP pública de OCI](C:\Users\nuest\OneDrive\Documentos\Universidad\SEXTO_SEMESTRE\capturas_terraform\url.png)
+> ![Aplicación EcoRed Circular cargando desde la IP pública de OCI](docs/screenshots/url.png)
 
 ---
 
@@ -483,7 +482,9 @@ curl -I "$(terraform output -raw web_url)"
 Observa que aunque OCI asigne una **nueva IP pública** y una **nueva IP privada**, `cloud-init` vuelve a instalar Nginx, clonar `ecored-estatica` y abrir `iptables` automáticamente, por lo que al abrir la nueva `web_url` en el navegador la aplicación cargará inmediatamente.
 
 >
-> ![Prueba de terraform destroy y nuevo terraform apply](C:\Users\nuest\OneDrive\Documentos\Universidad\SEXTO_SEMESTRE\capturas_terraform\destroy1.png)
+> ![Prueba de terraform destroy (inicio)](docs/screenshots/destroy1.png)
+>
+> ![Resultado de terraform destroy (6 recursos eliminados)](docs/screenshots/destroy2.png)
 
 ---
 
